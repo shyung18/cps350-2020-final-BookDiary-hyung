@@ -27,7 +27,6 @@ public class NetworkUtils {
                 .appendQueryParameter(MAX_RESULTS, "10")
                 .appendQueryParameter(PRINT_TYPE, "books")
                 .build();
-        Log.i("Please", builtUri.toString());
 
         try {
             URL requestURL = new URL("https://www.googleapis.com/books/v1/volumes?q=love&maxResults=10&printType=books");
@@ -40,7 +39,6 @@ public class NetworkUtils {
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if(inputStream == null) {
-                //Log.i("input", "null");
                 return null;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -48,7 +46,6 @@ public class NetworkUtils {
             while((line= reader.readLine()) != null)
             {
                 buffer.append(line + "\n");
-                //Log.v("line", line);
             }
             if(buffer.length() == 0) {
                 return null;
@@ -72,7 +69,6 @@ public class NetworkUtils {
                     e.printStackTrace();
                 }
             }
-            //Log.v("bookJsonString", bookJSONString);
             return bookJSONString;
         }
     }
