@@ -1,10 +1,15 @@
 package com.example.bookdiary.ui.search;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
@@ -12,6 +17,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,6 +44,8 @@ public class SearchFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private List<Items> dataList;
+    private SearchView searchView = null;
+    private SearchView.OnQueryTextListener queryTextListener;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -45,10 +53,9 @@ public class SearchFragment extends Fragment {
         searchViewModel =
                 ViewModelProviders.of(this).get(SearchViewModel.class);
         root = inflater.inflate(R.layout.fragment_search, container, false);
-        //final TextView textView = root.findViewById(R.id.text_dashboard);
-        final AutoCompleteTextView searchBar = (AutoCompleteTextView) root.findViewById(R.id.searchBar);
-        Button button = (Button) root.findViewById(R.id.searchButton);
-        //final CardView cardView = new CardView(root.getContext());
+        //final SearchView searchView = root.findViewById(R.id.searchView);
+
+
         dataList = new ArrayList<>();
         recyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
 
@@ -63,30 +70,42 @@ public class SearchFragment extends Fragment {
         layoutManager = new LinearLayoutManager(root.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        // specify an adapter (see also next example)
 
-
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v)
-            {
-                com.example.bookdiary.ui.search.CardView cardView = new com.example.bookdiary.ui.search.CardView();
-                FetchBook fetchBook = new FetchBook();
-                com.example.bookdiary.ui.search.CardView cv;
-                String result = "";
-                try {
-                    result = fetchBook.execute(searchBar.getText().toString()).get();
-                    setData(result);
-
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
+//        // specify an adapter (see also next example)
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                com.example.bookdiary.ui.search.CardView cardView = new com.example.bookdiary.ui.search.CardView();
+//                FetchBook fetchBook = new FetchBook();
+//                com.example.bookdiary.ui.search.CardView cv;
+//                String result = "";
+//                try {
+//                    result = fetchBook.execute("Temp data").get();
+//                    setData(result);
+//
+//                } catch (ExecutionException e) {
+//                    e.printStackTrace();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
         return root;
     }
+//
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setHasOptionsMenu(true);
+//    }
+//
+
 
     void setData(String data)
     {
