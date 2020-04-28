@@ -98,18 +98,6 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-        inflater.inflate(R.menu.options_menu, menu);
-        MenuItem item = menu.findItem(R.id.search);
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
-
-        SearchView searchView = (SearchView) item.getActionView();
-        //searchView.setOnQueryTextListener(this); // Fragment implements SearchView.OnQueryTextListener
-    }
-
 
 
 //    @Override
