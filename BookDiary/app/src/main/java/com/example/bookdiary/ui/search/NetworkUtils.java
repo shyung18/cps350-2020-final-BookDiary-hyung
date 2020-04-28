@@ -70,6 +70,7 @@ public class NetworkUtils {
                     e.printStackTrace();
                 }
             }
+            //Log.v("bookjson", bookJSONString.toString());
             return bookJSONString;
         }
     }

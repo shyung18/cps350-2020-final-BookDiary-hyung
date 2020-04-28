@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 // device is rotated (which destroys and recreates the activities).
 // https://developer.android.com/topic/libraries/architecture/saving-states
 public class SearchViewModel extends ViewModel {
+
     String getText() {
         return passage;
     }

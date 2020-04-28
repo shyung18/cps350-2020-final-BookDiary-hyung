@@ -3,6 +3,7 @@ package com.example.bookdiary;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -12,9 +13,18 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SearchView;
 
+import com.example.bookdiary.ui.home.HomeFragment;
+import com.example.bookdiary.ui.notifications.NotificationsFragment;
 import com.example.bookdiary.ui.search.SearchFragment;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -29,92 +39,98 @@ public class MainActivity extends AppCompatActivity {
 
     private SearchFragment searchFragment;
     private BottomNavigationView bottomNavigationView;
+    private AppBarConfiguration appBarConfiguration;
+    private FragmentTransaction ft;
+
+    private GoogleSignInClient mGoogleSignInClient;
+    private String userName;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String personId;
+    private Uri personPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if(findViewById(R.id.nav_host_fragment_container) != null)
+        {
+            return;
+        }
+
         BottomNavigationView navView = findViewById(R.id.nav_view);
+        navView.setOnNavigationItemSelectedListener(navList);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+        appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_search, R.id.navigation_notifications)
                 .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+        if(acct !=null )
+        {
+            userName = acct.getDisplayName();
+            firstName = acct.getGivenName();
+            lastName = acct.getFamilyName();
+            email = acct.getEmail();
+            personId = acct.getId();
+            personPhoto = acct.getPhotoUrl();
+        }
     }
 
 
+    private void updateUI(GoogleSignInAccount account) {
+        if(account==null)
+        {
+            Log.v("Sign", "need to sign in");
+        }
+        else
+        {
+            switchContent(R.id.fragment_container, new HomeFragment());
+        }
+    }
+
+    public void switchContent(int id, Fragment fragment) {
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(id, fragment, fragment.toString());
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navList =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
+                {
+                    Fragment selectedFragment = null;
+                    switch (menuItem.getItemId()) {
+                        case R.id.navigation_search:
+                            Log.v("Here", "here");
+                            selectedFragment = new SearchFragment();
+                            break;
+                        case R.id.navigation_notifications:
+                            selectedFragment = new NotificationsFragment();
+                            break;
+                        case R.id.navigation_home:
+                            selectedFragment = new HomeFragment();
+                            break;
+                    }
+                    switchContent(R.id.fragment_container, selectedFragment);
+                    return true;
+                }
+
+            };
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
-        final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
-
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onOptionsItemSelected(menu.findItem(R.id.search));
-            }
-        });
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Log.v("Submit", query);
-                // Create fragment and give it an argument specifying the article it should show
-                // Set up fragment manager in order to create a fragment dynamically
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-                // Instantiate PassageFragment in a frame in this activity
-                searchFragment = new SearchFragment();
-                Bundle b = new Bundle();
-                b.putString("msg", query);
-
-                searchFragment.setArguments(b);
-
-                bottomNavigationView=(BottomNavigationView)findViewById(R.id.nav_view);
-                bottomNavigationView.getMenu().findItem(R.id.navigation_search).setChecked(true);
-                fragmentTransaction.add(R.id.nav_host_fragment, searchFragment);
-                fragmentTransaction.commit();
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
         return true;
     }
 
-//    @Override
-//    public boolean onContextItemSelected(MenuItem item) {
-//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-//        switch (item.getItemId()) {
-//            case R.id.search:
-//                Log.v("search", "search selected");
-//                return true;
-//            default:
-//                return super.onContextItemSelected(item);
-//        }
-//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.v("yo", "yo");
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.search:
-                Log.v("search", "search selected");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 }
