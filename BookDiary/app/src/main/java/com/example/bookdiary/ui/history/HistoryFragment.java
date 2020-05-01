@@ -1,4 +1,4 @@
-package com.example.bookdiary.ui.notifications;
+package com.example.bookdiary.ui.history;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

@@ -1,4 +1,4 @@
-package com.example.bookdiary.ui.notifications;
+package com.example.bookdiary.ui.history;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
