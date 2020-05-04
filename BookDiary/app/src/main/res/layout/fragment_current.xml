@@ -8,10 +8,9 @@
 
     <ImageView
         android:id="@+id/main_image"
-        android:layout_width="227dp"
-        android:layout_height="262dp"
+        android:layout_width="228dp"
+        android:layout_height="264dp"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,15 +18,15 @@
 
     <TextView
         android:id="@+id/main_title"
-        android:layout_width="119dp"
-        android:layout_height="54dp"
+        android:layout_width="139dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:text="TextView"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/main_image"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,58 +34,43 @@
         android:id="@+id/main_author"
         android:layout_width="116dp"
         android:layout_height="62dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/main_title"
         app:layout_constraintTop_toBottomOf="@+id/main_title" />
 
-    <RelativeLayout
-        android:id="@+id/description"
-        android:layout_width="149dp"
-        android:layout_height="363dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_image"
-        app:layout_constraintVertical_bias="0.362" />
-
-<!--    <Button-->
-<!--        android:id="@+id/eraser"-->
-<!--        android:layout_width="94dp"-->
-<!--        android:layout_height="42dp"-->
-<!--        android:layout_marginTop="109dp"-->
-<!--        android:layout_marginEnd="24dp"-->
-<!--        android:layout_marginRight="24dp"-->
-<!--        android:layout_marginBottom="16dp"-->
-<!--        android:text="ToggleButton"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/description"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/main_author" />-->
-
     <EditText
         android:id="@+id/diary"
-        android:layout_width="205dp"
-        android:layout_height="366dp"
+        android:layout_width="380dp"
+        android:layout_height="372dp"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="38dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
         android:ems="10"
         android:gravity="start|top"
         android:inputType="textMultiLine"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/description"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_image" />
+
+    <Button
+        android:id="@+id/doneButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Done"
+        app:layout_constraintStart_toStartOf="@+id/main_title"
+        app:layout_constraintTop_toBottomOf="@+id/main_author" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="167dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="40dp"
+        android:text="Reflection"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/main_title"
+        app:layout_constraintTop_toBottomOf="@+id/doneButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

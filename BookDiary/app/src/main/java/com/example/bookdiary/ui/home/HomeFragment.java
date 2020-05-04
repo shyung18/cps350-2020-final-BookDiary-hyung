@@ -4,43 +4,38 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.ui.AppBarConfiguration;
 
+import com.example.bookdiary.FetchMyBookLibrary;
 import com.example.bookdiary.R;
-import com.example.bookdiary.ui.notifications.NotificationsFragment;
+import com.example.bookdiary.ui.history.HistoryFragment;
 import com.example.bookdiary.ui.search.SearchFragment;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.concurrent.ExecutionException;
 
 public class HomeFragment extends Fragment {
 //implements SearchView.OnQueryTextListener
     private HomeViewModel homeViewModel;
     private BottomNavigationView bottomNavigationView;
-
-    public HomeFragment() {
-
-    }
+    private String authToken;
+    private FetchMyBookLibrary fetchMyBookLibrary;
+    private String bookTitle = "";
+    private String bookAuthors = "";
+    private Bitmap bookImage;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -48,82 +43,88 @@ public class HomeFragment extends Fragment {
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_current, container, false);
         setHasOptionsMenu(true); // Add this! (as above)
-
-
         Bundle bundle = this.getArguments();
-        String title = "";
-        String authors = "";
-        Bitmap bitmap = null;
-        if (bundle != null) {
-            title = bundle.get("title").toString();
-            authors = bundle.get("authors").toString();
-            bitmap = bundle.getParcelable("image");
+
+        if (bundle != null && bundle.get("authToken") !=null) {
+            authToken = bundle.getString("authToken");
+
+        }
+        if(bundle.get("title") !=null)
+        {
+            bookTitle = bundle.getString("title");
+            bookAuthors = bundle.getString("authors");
+            bookImage = bundle.getParcelable("image");
+        }
+        else
+        {
+            fetchMyBookLibrary = new FetchMyBookLibrary("getCurrentRead", authToken);
+            String result = "";
+            try {
+                result = fetchMyBookLibrary.execute().get();
+                setData(result);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         }
 
-//        ImageView imageView = root.findViewById(R.id.main_image);
-//        imageView.setImageBitmap(homeViewModel.getImage());
         TextView titleNameView = root.findViewById(R.id.main_title);
         TextView authorNameView = root.findViewById(R.id.main_author);
         ImageView imageView = root.findViewById(R.id.main_image);
-        titleNameView.setText(title);
-        authorNameView.setText(authors);
-        imageView.setImageBitmap(bitmap);
+        titleNameView.setText(bookTitle);
+        authorNameView.setText(bookAuthors);
+        imageView.setImageBitmap(bookImage);
 
-        RelativeLayout pv = root.findViewById(R.id.description);
-        final PaintView paintView = new PaintView(root.getContext());
-        pv.addView(paintView);
+        Button doneButton = root.findViewById(R.id.doneButton);
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-//        Button eraserToggle = root.findViewById(R.id.eraser);
-//        eraserToggle.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                paintView.setErase(true);
-//            }
-//        });
-
-
-
-
-//        TextView authorNameView = root.findViewById(R.id.main_author);
-//        authorNameView.setText(homeViewModel.getAuthors());
-//        final TextView textView = root.findViewById(R.id.text_home);
-//        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
-
+            }
+        });
 
         return root;
     }
 
 
 
-//    @Override
-//    public boolean onQueryTextChange(String query) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean onQueryTextSubmit(String query) {
-//        // Create fragment and give it an argument specifying the article it should show
-//        SearchFragment searchFragment = new SearchFragment();
-//        Bundle args = new Bundle();
-////        args.putInt(SearchFragment.ARG_POSITION, position);
-////        newFragment.setArguments(args);
-//
-//        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-//
-//// Replace whatever is in the fragment_container view with this fragment,
-//// and add the transaction to the back stack so the user can navigate back
-//        transaction.replace(R.id.nav_host_fragment, searchFragment);
-//        transaction.addToBackStack(null);
-//        //bottomNavigationView.getMenu().getItem(R.id.navigation_search).setChecked(true);
-//
-//// Commit the transaction
-//        transaction.commit();
-//        return false;
-//    }
+    void setData(String data)
+    {
+        try {
+            JSONObject jsonObject = new JSONObject(data);
+            JSONArray itemsArray = jsonObject.getJSONArray("items");
+                JSONObject book = itemsArray.getJSONObject(0);
+                String title = null;
+                JSONArray authors = null;
+                String imageUrl = null;
+                JSONObject volumeInfo = book.getJSONObject("volumeInfo");
 
+                try {
+                    //imageUrl= volumeInfo.getJSONObject("imageLinks").getString("thumbnail");
+                    title = volumeInfo.getString("title");
+                    authors = volumeInfo.getJSONArray("authors");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (title != null && authors != null) {
+                    bookTitle = title;
+                    for(int i =0; i<authors.length(); i++)
+                    {
+                        try{
+                            bookAuthors+=authors.get(i).toString() + ", ";
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    bookImage = fetchMyBookLibrary.getCurrentImage();
+                }
+
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

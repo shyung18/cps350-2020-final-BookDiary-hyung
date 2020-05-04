@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bookdiary.FetchMyBookLibrary;
 import com.example.bookdiary.MainActivity;
 import com.example.bookdiary.R;
 import com.example.bookdiary.ui.home.HomeFragment;
@@ -76,23 +77,26 @@ public class Items_Adapter extends RecyclerView.Adapter<Items_Adapter.MyViewHold
                 info.putString("title", item.getTitle());
                 info.putString("authors", item.getAuthors());
                 info.putParcelable("image", item.getImage());
-                homeFragment.setArguments(info);
-                switchContent(R.id.fragment_container, homeFragment);
+                info.putString("bookId", item.getBookId());
+                FetchMyBookLibrary fetchMyBookLibrary = new FetchMyBookLibrary("postCurrentRead", item.getAuthToken());
+                fetchMyBookLibrary.execute(item.getBookId());
+                switchContent(R.id.fragment_container, homeFragment, info);
             }
         });
 
     }
 
-    public void switchContent(int id, Fragment fragment) {
+    public void switchContent(int id, Fragment fragment, Bundle bundle) {
         if (mContext == null)
             return;
         if (mContext instanceof MainActivity) {
             MainActivity mainActivity = (MainActivity) mContext;
             Fragment frag = fragment;
-            mainActivity.switchContent(id, frag);
+            mainActivity.switchContent(id, frag, bundle);
         }
 
     }
+
 
 //    UpdateHomeListener updateHomeListener;
 //    public interface UpdateHomeListener

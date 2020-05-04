@@ -18,11 +18,18 @@ public class Items {
     private String title;
     private String authors = "";
     private Bitmap image;
+    private String bookId;
+    private String authToken;
+
+    Items(String token) {authToken = token;}
+
 
     String getTitle()
     {
         return title;
     }
+
+    String getAuthToken() {return authToken;}
 
     String getAuthors()
     {
@@ -33,18 +40,22 @@ public class Items {
     {
         return image;
     }
+
+    String getBookId() {return bookId;}
     
 
     void setTitle(String t) {
         title = t;
     }
 
+    void setAuthToken(String token) {authToken = token;}
+
     void setAuthors(JSONArray a)
     {
         for(int i =0; i<a.length(); i++)
         {
             try{
-                authors+=a.get(i).toString() + "\n";
+                authors+=a.get(i).toString() + ", ";
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -54,6 +65,11 @@ public class Items {
     void setImage(Bitmap bitmap)
     {
             image = bitmap;
+    }
+
+    void setBookId(String id)
+    {
+        bookId = id;
     }
 
 }
