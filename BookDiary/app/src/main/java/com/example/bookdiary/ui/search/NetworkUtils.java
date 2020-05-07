@@ -16,6 +16,7 @@ public class NetworkUtils {
     private static final String QUERY_PARAM = "q";
     private static final String MAX_RESULTS = "maxResults";
     private static final String PRINT_TYPE = "printType";
+    private String query;
 
     static String getBookInfo(String queryString)
     {
@@ -23,13 +24,13 @@ public class NetworkUtils {
         BufferedReader reader = null;
         String bookJSONString = "";
         Uri builtUri = Uri.parse(URL).buildUpon()
-                .appendQueryParameter(QUERY_PARAM, "love")
+                .appendQueryParameter(QUERY_PARAM, queryString)
                 .appendQueryParameter(MAX_RESULTS, "10")
                 .appendQueryParameter(PRINT_TYPE, "books")
                 .build();
 
         try {
-            URL requestURL = new URL("https://www.googleapis.com/books/v1/volumes?q=love&maxResults=10&printType=books");
+            URL requestURL = new URL("https://www.googleapis.com/books/v1/volumes?q="+ queryString + "&maxResults=10&printType=books");
             urlConnection = (HttpURLConnection) requestURL.openConnection();
             //urlConnection.setRequestMethod("GET");
 

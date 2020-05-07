@@ -21,7 +21,9 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -44,8 +46,9 @@ public class SearchFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private List<Items> dataList;
-    private SearchView searchView = null;
+    private SearchView searchView;
     private SearchView.OnQueryTextListener queryTextListener;
+    private String query;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -53,8 +56,12 @@ public class SearchFragment extends Fragment {
         searchViewModel =
                 ViewModelProviders.of(this).get(SearchViewModel.class);
         root = inflater.inflate(R.layout.fragment_search, container, false);
-        //final SearchView searchView = root.findViewById(R.id.searchView);
+        setHasOptionsMenu(true);
 
+        //searchView = root.findViewById(R.id.searchView);
+        //MenuItem item = getToolbar().getMenu().findItem(Menu.FIRST);
+
+//        String data = s.getQuery().toString();
 
         dataList = new ArrayList<>();
         recyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
@@ -69,33 +76,7 @@ public class SearchFragment extends Fragment {
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(root.getContext());
         recyclerView.setLayoutManager(layoutManager);
-
-
-//        // specify an adapter (see also next example)
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                com.example.bookdiary.ui.search.CardView cardView = new com.example.bookdiary.ui.search.CardView();
-//                FetchBook fetchBook = new FetchBook();
-//                com.example.bookdiary.ui.search.CardView cv;
-//                String result = "";
-//                try {
-//                    result = fetchBook.execute("Temp data").get();
-//                    setData(result);
-//
-//                } catch (ExecutionException e) {
-//                    e.printStackTrace();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                return false;
-//            }
-//        });
+        //getResult();
         return root;
     }
 //
@@ -105,6 +86,58 @@ public class SearchFragment extends Fragment {
 //        setHasOptionsMenu(true);
 //    }
 //
+
+    public void getResult()
+    {
+        // specify an adapter (see also next example)
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                com.example.bookdiary.ui.search.CardView cardView = new com.example.bookdiary.ui.search.CardView();
+                FetchBook fetchBook = new FetchBook();
+                com.example.bookdiary.ui.search.CardView cv;
+                String result = "";
+                try {
+                    result = fetchBook.execute(query).get();
+                    setData(result);
+
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+@Override
+public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    setHasOptionsMenu(true);
+    super.onActivityCreated(savedInstanceState);
+    if (getArguments() != null) {
+        String query = getArguments().getString("params");
+        com.example.bookdiary.ui.search.CardView cardView = new com.example.bookdiary.ui.search.CardView();
+        FetchBook fetchBook = new FetchBook();
+        com.example.bookdiary.ui.search.CardView cv;
+        String result = "";
+        try {
+            result = fetchBook.execute(query).get();
+            setData(result);
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    //String query = savedInstanceState.getString("msg", "None");
+}
 
 
     void setData(String data)
