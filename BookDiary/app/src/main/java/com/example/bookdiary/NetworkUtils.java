@@ -1,4 +1,4 @@
-package com.example.bookdiary.ui.search;
+package com.example.bookdiary;
 
 import android.accounts.AccountManager;
 import android.net.Uri;
@@ -203,6 +203,112 @@ public class NetworkUtils {
         OutputStream out = null;
         try {
             URL url = new URL("https://www.googleapis.com/books/v1/mylibrary/bookshelves/3/addVolume?volumeId=" + bookId + "&key=" + apiKey);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.addRequestProperty("client_id", "690614837290-93ha31tsre16oijd8lhld38i1gdad9m9.apps.googleusercontent.com");
+            conn.addRequestProperty("client_secret", "f_UPM44IW2JFrE1UErAeHVPJ");
+            conn.addRequestProperty("Content-Type", "application/json");
+            conn.addRequestProperty("Content-Length", "CONTENT_LENGTH");
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Authorization", "OAuth " + authToken);
+
+
+            // Get the server response
+
+            reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+
+            // Read Server Response
+            while((line = reader.readLine()) != null)
+            {
+                // Append server response in string
+                sb.append(line + "\n");
+            }
+
+            String text = sb.toString();
+            System.out.println(conn.getResponseCode());
+
+//
+//            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+//            writer.write(data);
+//            writer.flush();
+//            writer.close();
+//            out.close();
+            if (conn != null) {
+                ((HttpURLConnection) conn).disconnect();
+            }
+
+            return result;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String removeCurrentRead(String authToken, String bookId) {
+        HttpURLConnection conn = null;
+        BufferedReader reader = null;
+        String result = "";
+        OutputStream out = null;
+        try {
+            URL url = new URL("https://www.googleapis.com/books/v1/mylibrary/bookshelves/3/removeVolume?volumeId=" + bookId + "&key=" + apiKey);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.addRequestProperty("client_id", "690614837290-93ha31tsre16oijd8lhld38i1gdad9m9.apps.googleusercontent.com");
+            conn.addRequestProperty("client_secret", "f_UPM44IW2JFrE1UErAeHVPJ");
+            conn.addRequestProperty("Content-Type", "application/json");
+            conn.addRequestProperty("Content-Length", "CONTENT_LENGTH");
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Authorization", "OAuth " + authToken);
+
+
+            // Get the server response
+
+            reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+
+            // Read Server Response
+            while((line = reader.readLine()) != null)
+            {
+                // Append server response in string
+                sb.append(line + "\n");
+            }
+
+            String text = sb.toString();
+            System.out.println(conn.getResponseCode());
+
+//
+//            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+//            writer.write(data);
+//            writer.flush();
+//            writer.close();
+//            out.close();
+            if (conn != null) {
+                ((HttpURLConnection) conn).disconnect();
+            }
+
+            return result;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String postHistoryBook(String authToken, String bookId) {
+        HttpURLConnection conn = null;
+        BufferedReader reader = null;
+        String result = "";
+        OutputStream out = null;
+        try {
+            URL url = new URL("https://www.googleapis.com/books/v1/mylibrary/bookshelves/4/addVolume?volumeId=" + bookId + "&key=" + apiKey);
             conn = (HttpURLConnection) url.openConnection();
             conn.addRequestProperty("client_id", "690614837290-93ha31tsre16oijd8lhld38i1gdad9m9.apps.googleusercontent.com");
             conn.addRequestProperty("client_secret", "f_UPM44IW2JFrE1UErAeHVPJ");

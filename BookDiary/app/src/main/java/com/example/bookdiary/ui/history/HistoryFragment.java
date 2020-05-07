@@ -1,31 +1,30 @@
 package com.example.bookdiary.ui.history;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.akshaykale.swipetimeline.TimelineFragment;
 import com.akshaykale.swipetimeline.TimelineGroupType;
 import com.akshaykale.swipetimeline.TimelineObject;
+import com.akshaykale.swipetimeline.TimelineObjectClickListener;
 import com.example.bookdiary.FetchMyBookLibrary;
 import com.example.bookdiary.R;
-import com.example.bookdiary.ui.search.Items;
-import com.example.bookdiary.ui.search.NetworkUtils;
+import com.example.bookdiary.ui.home.PopUpWindow;
+import com.example.bookdiary.ui.search.Items_Adapter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +38,8 @@ public class HistoryFragment extends Fragment {
     private String authToken;
     ArrayList<TimelineObject> objs;
     FetchMyBookLibrary fetchMyBookLibrary;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager layoutManager;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -48,6 +49,7 @@ public class HistoryFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_history, container, false);
         objs = new ArrayList<>();
         Bundle bundle = this.getArguments();
+        mAdapter = new TimeLine_Adapter(root.getContext(), objs);
 
         if (bundle != null) {
             //Log.v("authToken", bundle.getString("authToken"));
@@ -71,12 +73,24 @@ public class HistoryFragment extends Fragment {
         }
 
 
+
 //Set data
         mFragment.setData(objs, TimelineGroupType.MONTH);
-//Set configurations
-        //mFragment.addOnClickListener(this);
+        mFragment.addOnClickListener(new TimelineObjectClickListener() {
+            @Override
+            public void onTimelineObjectClicked(TimelineObject timelineObject) {
+                
+                startActivity(new Intent(getContext(), BookUpdate.class));
+             }
+             @Override
+             public void onTimelineObjectLongClicked(TimelineObject timelineObject) {
 
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+             }
+             });
+//Set configurations
+                //mFragment.addOnClickListener(this);
+
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, mFragment);
         transaction.commit();
 
@@ -155,6 +169,8 @@ public class HistoryFragment extends Fragment {
             objs.add(new Book(dtemp.getTime(), "Book", null));
             objs.add(new Book(dtemp.getTime(), "Book", null));
 
+
+
             //temp data
 
 
@@ -163,5 +179,7 @@ public class HistoryFragment extends Fragment {
         catch (Exception e) {
             e.printStackTrace();
         }
+
+        mAdapter.notifyDataSetChanged();
     }
 }

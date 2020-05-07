@@ -34,8 +34,6 @@ public class SearchFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private List<Items> dataList;
     private SearchView searchView;
-    private SearchView.OnQueryTextListener queryTextListener;
-    private String query;
     private FetchMyBookLibrary fetchMyBookLibrary;
 
     private String authToken;
@@ -84,8 +82,8 @@ public class SearchFragment extends Fragment {
 
     public void getResult()
     {
-        Log.v("listner", "listening");
-        // specify an adapter (see also next example)
+        searchView.setIconifiedByDefault(false);
+        searchView.setSubmitButtonEnabled(true);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -115,6 +113,7 @@ public class SearchFragment extends Fragment {
 
     void setData(String data)
     {
+        dataList.removeAll(dataList);
         Log.v("data", data);
         // Create camera layout params
 //        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -151,6 +150,7 @@ public class SearchFragment extends Fragment {
                     item.setImage(fetchMyBookLibrary.getImages(i));
                     item.setBookId(bookId);
                     dataList.add(item);
+
                 }
             }
 

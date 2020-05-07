@@ -30,6 +30,8 @@
         <activity
             android:name=".MainActivity">
         </activity>
+        <activity android:name=".ui.home.PopUpWindow"></activity>
+        <activity android:name=".ui.history.BookUpdate"></activity>
     </application>
 
 </manifest>

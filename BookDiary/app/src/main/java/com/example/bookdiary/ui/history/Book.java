@@ -7,6 +7,7 @@ import android.util.ArrayMap;
 import android.util.Log;
 
 import com.akshaykale.swipetimeline.TimelineObject;
+import com.akshaykale.swipetimeline.TimelineObjectClickListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +32,8 @@ public class Book implements TimelineObject {
     public Book() {
 
     }
+
+
 
     @Override
     public long getTimestamp() {

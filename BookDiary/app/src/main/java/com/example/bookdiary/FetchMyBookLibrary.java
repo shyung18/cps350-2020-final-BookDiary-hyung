@@ -1,34 +1,17 @@
 package com.example.bookdiary;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.text.Layout;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextSwitcher;
-import android.widget.TextView;
-
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.bookdiary.R;
-import com.example.bookdiary.ui.search.NetworkUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 public class FetchMyBookLibrary extends AsyncTask<String, Void, String> {
 
@@ -152,6 +135,14 @@ public class FetchMyBookLibrary extends AsyncTask<String, Void, String> {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+        else if(type == "removeCurrentRead")
+        {
+            result = NetworkUtils.removeCurrentRead(authToken, strings[0]);
+        }
+        else if(type == "postHistoryBook")
+        {
+            result = NetworkUtils.postHistoryBook(authToken, strings[0]);
         }
         return result;
     }

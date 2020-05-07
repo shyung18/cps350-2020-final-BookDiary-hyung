@@ -1,10 +1,11 @@
 package com.example.bookdiary.ui.home;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,9 +17,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.bookdiary.FetchMyBookLibrary;
+import com.example.bookdiary.MainActivity;
 import com.example.bookdiary.R;
 import com.example.bookdiary.ui.history.HistoryFragment;
-import com.example.bookdiary.ui.search.SearchFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
@@ -30,12 +31,16 @@ import java.util.concurrent.ExecutionException;
 public class HomeFragment extends Fragment {
 //implements SearchView.OnQueryTextListener
     private HomeViewModel homeViewModel;
+    private Context mContext;
     private BottomNavigationView bottomNavigationView;
     private String authToken;
     private FetchMyBookLibrary fetchMyBookLibrary;
     private String bookTitle = "";
     private String bookAuthors = "";
     private Bitmap bookImage;
+    private String bookId;
+    private Canvas canvas;
+    private String reflectionText = "";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -44,18 +49,23 @@ public class HomeFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_current, container, false);
         setHasOptionsMenu(true); // Add this! (as above)
         Bundle bundle = this.getArguments();
+        mContext = root.getContext();
 
-        if (bundle != null && bundle.get("authToken") !=null) {
-            authToken = bundle.getString("authToken");
+        authToken = bundle.getString("authToken");
 
-        }
         if(bundle.get("title") !=null)
         {
             bookTitle = bundle.getString("title");
             bookAuthors = bundle.getString("authors");
             bookImage = bundle.getParcelable("image");
         }
-        else
+
+        if(bundle.get("reflectionText") !=null)
+        {
+            reflectionText = bundle.getString("reflectionText");
+        }
+
+        if(bundle.get("title") == null)
         {
             fetchMyBookLibrary = new FetchMyBookLibrary("getCurrentRead", authToken);
             String result = "";
@@ -69,25 +79,65 @@ public class HomeFragment extends Fragment {
             }
         }
 
+
         TextView titleNameView = root.findViewById(R.id.main_title);
         TextView authorNameView = root.findViewById(R.id.main_author);
         ImageView imageView = root.findViewById(R.id.main_image);
-        titleNameView.setText(bookTitle);
-        authorNameView.setText(bookAuthors);
-        imageView.setImageBitmap(bookImage);
-
         Button doneButton = root.findViewById(R.id.doneButton);
-        doneButton.setOnClickListener(new View.OnClickListener() {
+        ReflectionView reflectionView = root.findViewById(R.id.rView);
+        reflectionView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), PopUpWindow.class));
             }
         });
+        if(reflectionText != "")
+        {
+            reflectionView.setmText(reflectionText);
+        }
+
+        if(bookTitle == "")
+        {
+            titleNameView.setText("No Book in Progress");
+            authorNameView.setText("Go search for a new book!");
+            imageView.setImageResource(R.drawable.none_icon);
+            doneButton.setText("Search");
+        }
+        else
+        {
+            titleNameView.setText(bookTitle);
+            authorNameView.setText(bookAuthors);
+            imageView.setImageBitmap(bookImage);
+            doneButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FetchMyBookLibrary fetchMyBookLibrary = new FetchMyBookLibrary("removeCurrentRead", authToken);
+                    fetchMyBookLibrary.execute(bookId);
+                    fetchMyBookLibrary = new FetchMyBookLibrary("postHistoryBook", authToken);
+                    fetchMyBookLibrary.execute(bookId);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("authToken", authToken);
+                    switchContent(R.id.fragment_container, new HistoryFragment(), bundle);
+
+                }
+            });
+        }
+
 
         return root;
     }
 
 
+    public void switchContent(int id, Fragment fragment, Bundle bundle) {
+        if (mContext == null)
+            return;
+        if (mContext instanceof MainActivity) {
+            MainActivity mainActivity = (MainActivity) mContext;
+            Fragment frag = fragment;
+            mainActivity.switchContent(id, frag, bundle);
+        }
+
+    }
 
     void setData(String data)
     {
@@ -98,6 +148,7 @@ public class HomeFragment extends Fragment {
                 String title = null;
                 JSONArray authors = null;
                 String imageUrl = null;
+                bookId = book.getString("id");
                 JSONObject volumeInfo = book.getJSONObject("volumeInfo");
 
                 try {

@@ -11,9 +11,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.bookdiary.ui.home.HomeFragment;
 import com.example.bookdiary.ui.history.HistoryFragment;
@@ -48,6 +50,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.ui.AppBarConfiguration;
 
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private Uri personPhoto;
     private String authCode;
     private FetchMyBookLibrary fetchMyBookLibrary;
+    private Bundle receivedBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        navView.setOnNavigationItemSelectedListener(navList);
+        bottomNavigationView = findViewById(R.id.nav_view);
+        bottomNavigationView.setOnNavigationItemSelectedListener(navList);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = new AppBarConfiguration.Builder(
@@ -110,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             authCode = account.getServerAuthCode();
         }
         authCode = "";
+        receivedBundle = getIntent().getExtras();
         AccountManager am = AccountManager.get(this);
         Bundle options = new Bundle();
         am.getAuthToken(
@@ -119,7 +124,15 @@ public class MainActivity extends AppCompatActivity {
                 this,                           // Your activity
                 new OnTokenAcquired(),          // Callback called when a token is successfully acquired
                 new Handler(new OnError()));    // Callback called if an error occurs
+//        Intent intent = getIntent();
+//        //get the received text
+//        String receivedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+//        if(receivedText != null)
+//        {
+//
+//        }
     }
+
 
 
     private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
@@ -142,20 +155,30 @@ public class MainActivity extends AppCompatActivity {
             String token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
             Log.v("token", token);
             authCode = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+            Bundle b = new Bundle();
+            b.putString("authToken", authCode);
+            if(receivedBundle.getString("reflectionText")!=null)
+            {
+                b.putString("reflectionText", receivedBundle.getString("reflectionText"));
+            }
+            switchContent(R.id.fragment_container, new HomeFragment(), b);
         }
     }
 
     public void switchContent(int id, Fragment fragment, Bundle data) {
+
         if(data != null)
         {
             fragment.setArguments(data);
+            Log.v("setting ", "arguments");
         }
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(id, fragment, fragment.toString());
-
         ft.addToBackStack(null);
         ft.commit();
     }
+
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener navList =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -177,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     Bundle bundle = new Bundle();
                     bundle.putString("authToken", authCode);
+
                     switchContent(R.id.fragment_container, selectedFragment, bundle);
                     return true;
                 }
