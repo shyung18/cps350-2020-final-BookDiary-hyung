@@ -175,6 +175,8 @@ public class HistoryFragment extends Fragment {
             objs.add(new Book(dtemp.getTime(), "Book", null));
             objs.add(new Book(dtemp.getTime(), "Book", null));
 
+            this.sort(objs);
+
 
 
             //temp data
@@ -187,5 +189,21 @@ public class HistoryFragment extends Fragment {
         }
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    private void sort(ArrayList<TimelineObject> objs) {
+        for (int i = 0; i < objs.size(); i++) {
+            long min = objs.get(i).getTimestamp();
+            int minId = i;
+            for (int j = i+1; j < objs.size(); j++) {
+                if (objs.get(j).getTimestamp() > min) {
+                    min = objs.get(j).getTimestamp();
+                    minId = j;
+                }
+            }
+            TimelineObject temp = objs.get(i);
+            objs.set(i, objs.get(minId));
+            objs.set(minId, temp);
+        }
     }
 }
