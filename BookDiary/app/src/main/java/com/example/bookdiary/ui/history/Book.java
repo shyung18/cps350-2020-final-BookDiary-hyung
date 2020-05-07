@@ -21,19 +21,13 @@ import java.util.Date;
 public class Book implements TimelineObject {
     long timestamp;
     String name, url;
-
+    private String authors = "";
 
     Book(long time, String category, String url) {
         timestamp = time;
         name = category;
         this.url = url;
     }
-
-    public Book() {
-
-    }
-
-
 
     @Override
     public long getTimestamp() {
@@ -47,5 +41,23 @@ public class Book implements TimelineObject {
     public String getImageUrl() {
         return url;
     }
+
+    public String getAuthors()
+    {
+        return authors;
+    }
+
+    public void setAuthors(JSONArray a)
+    {
+        for(int i =0; i<a.length(); i++)
+        {
+            try{
+                authors+=a.get(i).toString() + ", ";
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 }

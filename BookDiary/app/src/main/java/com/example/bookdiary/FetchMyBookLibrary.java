@@ -20,12 +20,14 @@ public class FetchMyBookLibrary extends AsyncTask<String, Void, String> {
     private String type;
     private ArrayList<Bitmap> images;
     private ArrayList<String> imageUrl;
+    private ArrayList<String> authors;
 
     public FetchMyBookLibrary(String t, String token)
     {
         authToken = token;
         images = new ArrayList<Bitmap>();
         imageUrl = new ArrayList<String>();
+        authors = new ArrayList<>();
         type = t;
     }
 
@@ -40,6 +42,8 @@ public class FetchMyBookLibrary extends AsyncTask<String, Void, String> {
     }
 
     public String getImageUrl(int index) {return imageUrl.get(index); }
+
+    public String getAuthor(int index) {return authors.get(index); }
 
     @Override
     protected String doInBackground(String... strings) {

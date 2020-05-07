@@ -23,6 +23,7 @@ import com.example.bookdiary.ui.home.PopUpWindow;
 import com.example.bookdiary.ui.search.Items_Adapter;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
@@ -40,6 +41,7 @@ public class HistoryFragment extends Fragment {
     FetchMyBookLibrary fetchMyBookLibrary;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    private String authors = "";
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -79,8 +81,12 @@ public class HistoryFragment extends Fragment {
         mFragment.addOnClickListener(new TimelineObjectClickListener() {
             @Override
             public void onTimelineObjectClicked(TimelineObject timelineObject) {
-                
-                startActivity(new Intent(getContext(), BookUpdate.class));
+                Book b = (Book) timelineObject;
+                Intent i = new Intent(getContext(), BookUpdate.class);
+                i.putExtra("title", timelineObject.getTitle());
+                i.putExtra("authors", b.getAuthors());
+                i.putExtra("imageUrl", timelineObject.getImageUrl());
+                startActivity(i);
              }
              @Override
              public void onTimelineObjectLongClicked(TimelineObject timelineObject) {
@@ -137,7 +143,6 @@ public class HistoryFragment extends Fragment {
                 }
 
                 if (title != null && authors != null && date != null) {
-                    System.out.println(date);
 
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
                     long dateInLong = 0;
@@ -150,10 +155,11 @@ public class HistoryFragment extends Fragment {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    System.out.println(dateInLong);
+
 
                     Book b = new Book(dateInLong, title, fetchMyBookLibrary.getImageUrl(i));
-                    objs.add(new Book(dateInLong, title, fetchMyBookLibrary.getImageUrl(i)));
+                    b.setAuthors(authors);
+                    objs.add(b);
                 }
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);

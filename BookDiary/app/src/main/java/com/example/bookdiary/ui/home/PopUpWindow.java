@@ -35,8 +35,6 @@ public class PopUpWindow extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString("reflectionText", textView.getText().toString());
                 Intent i = new Intent(getApplicationContext(), MainActivity.class);
                 i.putExtra("reflectionText", textView.getText().toString());
                 startActivity(i);
