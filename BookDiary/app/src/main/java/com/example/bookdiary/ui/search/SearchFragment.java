@@ -1,34 +1,21 @@
 package com.example.bookdiary.ui.search;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bookdiary.FetchMyBookLibrary;
 import com.example.bookdiary.R;
 
 import org.json.JSONArray;
@@ -47,8 +34,9 @@ public class SearchFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private List<Items> dataList;
     private SearchView searchView;
-    private SearchView.OnQueryTextListener queryTextListener;
-    private String query;
+    private FetchMyBookLibrary fetchMyBookLibrary;
+
+    private String authToken;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -56,12 +44,17 @@ public class SearchFragment extends Fragment {
         searchViewModel =
                 ViewModelProviders.of(this).get(SearchViewModel.class);
         root = inflater.inflate(R.layout.fragment_search, container, false);
+
+        Bundle bundle = this.getArguments();
+
+        if (bundle != null) {
+            //Log.v("authToken", bundle.getString("authToken"));
+            authToken = bundle.getString("authToken");
+        }
+
         setHasOptionsMenu(true);
 
-        //searchView = root.findViewById(R.id.searchView);
-        //MenuItem item = getToolbar().getMenu().findItem(Menu.FIRST);
-
-//        String data = s.getQuery().toString();
+        searchView = root.findViewById(R.id.searchView);
 
         dataList = new ArrayList<>();
         recyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
@@ -76,7 +69,7 @@ public class SearchFragment extends Fragment {
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(root.getContext());
         recyclerView.setLayoutManager(layoutManager);
-        //getResult();
+        getResult();
         return root;
     }
 //
@@ -89,16 +82,18 @@ public class SearchFragment extends Fragment {
 
     public void getResult()
     {
-        // specify an adapter (see also next example)
+        searchView.setIconifiedByDefault(false);
+        searchView.setSubmitButtonEnabled(true);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 com.example.bookdiary.ui.search.CardView cardView = new com.example.bookdiary.ui.search.CardView();
-                FetchBook fetchBook = new FetchBook();
+                //fetchBook = new FetchBook(authToken);
+                fetchMyBookLibrary = new FetchMyBookLibrary("getSearchResult", authToken);
                 com.example.bookdiary.ui.search.CardView cv;
                 String result = "";
                 try {
-                    result = fetchBook.execute(query).get();
+                    result = fetchMyBookLibrary.execute(query).get();
                     setData(result);
 
                 } catch (ExecutionException e) {
@@ -116,36 +111,14 @@ public class SearchFragment extends Fragment {
         });
     }
 
-@Override
-public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-    setHasOptionsMenu(true);
-    super.onActivityCreated(savedInstanceState);
-    if (getArguments() != null) {
-        String query = getArguments().getString("params");
-        com.example.bookdiary.ui.search.CardView cardView = new com.example.bookdiary.ui.search.CardView();
-        FetchBook fetchBook = new FetchBook();
-        com.example.bookdiary.ui.search.CardView cv;
-        String result = "";
-        try {
-            result = fetchBook.execute(query).get();
-            setData(result);
-
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-    //String query = savedInstanceState.getString("msg", "None");
-}
-
-
     void setData(String data)
     {
+        dataList.removeAll(dataList);
+        Log.v("data", data);
         // Create camera layout params
 //        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
 //                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
+        String id;
         try {
             JSONObject jsonObject = new JSONObject(data);
             JSONArray itemsArray = jsonObject.getJSONArray("items");
@@ -153,31 +126,40 @@ public void onActivityCreated(@Nullable Bundle savedInstanceState) {
             {
                 JSONObject book = itemsArray.getJSONObject(i);
                 String title = null;
-                String authors = null;
+                JSONArray authors = null;
+                String imageUrl = null;
+                String bookId = book.getString("id");
                 JSONObject volumeInfo = book.getJSONObject("volumeInfo");
 
                 try {
+                    //imageUrl= volumeInfo.getJSONObject("imageLinks").getString("thumbnail");
                     title = volumeInfo.getString("title");
-                    authors = volumeInfo.getString("authors");
+                    authors = volumeInfo.getJSONArray("authors");
+                    Log.v("got URL", "url");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
                 if (title != null && authors != null) {
 
-                    Items item = new Items();
+                    Items item = new Items(authToken);
+                    //Log.v("Authors", authors.get(0).toString());
                     item.setAuthors(authors);
                     item.setTitle(title);
+                    //item.setImage(imageUrl);
+                    item.setImage(fetchMyBookLibrary.getImages(i));
+                    item.setBookId(bookId);
                     dataList.add(item);
+
                 }
             }
-            mAdapter.notifyDataSetChanged();
+
 
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-
+        mAdapter.notifyDataSetChanged();
 
     }
 }
