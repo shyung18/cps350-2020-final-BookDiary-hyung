@@ -153,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
             // The token is a named value in the bundle. The name of the value
             // is stored in the constant AccountManager.KEY_AUTHTOKEN.
             String token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-            Log.v("token", token);
             authCode = bundle.getString(AccountManager.KEY_AUTHTOKEN);
             Bundle b = new Bundle();
             b.putString("authToken", authCode);
@@ -170,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
         if(data != null)
         {
             fragment.setArguments(data);
-            Log.v("setting ", "arguments");
         }
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(id, fragment, fragment.toString());
@@ -194,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
                             selectedFragment = new HistoryFragment();
                             break;
                         case R.id.navigation_home:
-                            Log.v("here", "here");
                             selectedFragment = new HomeFragment();
                             break;
                     }

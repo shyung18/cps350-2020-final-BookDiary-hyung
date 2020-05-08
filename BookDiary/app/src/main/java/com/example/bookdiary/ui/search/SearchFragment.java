@@ -48,7 +48,6 @@ public class SearchFragment extends Fragment {
         Bundle bundle = this.getArguments();
 
         if (bundle != null) {
-            //Log.v("authToken", bundle.getString("authToken"));
             authToken = bundle.getString("authToken");
         }
 
@@ -114,11 +113,6 @@ public class SearchFragment extends Fragment {
     void setData(String data)
     {
         dataList.removeAll(dataList);
-        Log.v("data", data);
-        // Create camera layout params
-//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        String id;
         try {
             JSONObject jsonObject = new JSONObject(data);
             JSONArray itemsArray = jsonObject.getJSONArray("items");
@@ -127,15 +121,12 @@ public class SearchFragment extends Fragment {
                 JSONObject book = itemsArray.getJSONObject(i);
                 String title = null;
                 JSONArray authors = null;
-                String imageUrl = null;
                 String bookId = book.getString("id");
                 JSONObject volumeInfo = book.getJSONObject("volumeInfo");
 
                 try {
-                    //imageUrl= volumeInfo.getJSONObject("imageLinks").getString("thumbnail");
                     title = volumeInfo.getString("title");
                     authors = volumeInfo.getJSONArray("authors");
-                    Log.v("got URL", "url");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -143,10 +134,8 @@ public class SearchFragment extends Fragment {
                 if (title != null && authors != null) {
 
                     Items item = new Items(authToken);
-                    //Log.v("Authors", authors.get(0).toString());
                     item.setAuthors(authors);
                     item.setTitle(title);
-                    //item.setImage(imageUrl);
                     item.setImage(fetchMyBookLibrary.getImages(i));
                     item.setBookId(bookId);
                     dataList.add(item);

@@ -90,7 +90,6 @@ public class NetworkUtils {
                     e.printStackTrace();
                 }
             }
-            //Log.v("bookjson", bookJSONString.toString());
             return bookJSONString;
         }
     }
@@ -187,7 +186,6 @@ public class NetworkUtils {
                     e.printStackTrace();
                 }
             }
-            Log.v("result", result.toString());
 
         } catch (IOException e) {
             e.printStackTrace();

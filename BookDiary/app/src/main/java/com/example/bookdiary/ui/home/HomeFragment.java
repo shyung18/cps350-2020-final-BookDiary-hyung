@@ -1,10 +1,13 @@
 package com.example.bookdiary.ui.home;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +29,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.concurrent.ExecutionException;
 
 public class HomeFragment extends Fragment {
@@ -42,6 +52,7 @@ public class HomeFragment extends Fragment {
     private Canvas canvas;
     private String reflectionText = "";
 
+    @SuppressLint("SetTextI18n")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
@@ -94,6 +105,10 @@ public class HomeFragment extends Fragment {
         if(reflectionText != "")
         {
             reflectionView.setmText(reflectionText);
+            SharedPreferences sharedPref = getActivity().getSharedPreferences("com.example.bookdiary", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(bookId, reflectionText);
+            editor.commit();
         }
 
         if(bookTitle == "")
@@ -171,8 +186,6 @@ public class HomeFragment extends Fragment {
                     }
                     bookImage = fetchMyBookLibrary.getCurrentImage();
                 }
-
-
         }
         catch (Exception e) {
             e.printStackTrace();

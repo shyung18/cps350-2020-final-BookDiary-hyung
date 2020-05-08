@@ -23,6 +23,7 @@ import com.example.bookdiary.ui.home.PopUpWindow;
 import com.example.bookdiary.ui.search.Items_Adapter;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
@@ -40,6 +41,7 @@ public class HistoryFragment extends Fragment {
     FetchMyBookLibrary fetchMyBookLibrary;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    private String authors = "";
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -52,10 +54,8 @@ public class HistoryFragment extends Fragment {
         mAdapter = new TimeLine_Adapter(root.getContext(), objs);
 
         if (bundle != null) {
-            //Log.v("authToken", bundle.getString("authToken"));
             authToken = bundle.getString("authToken");
         }
-        Log.v("authToken", authToken);
         fetchMyBookLibrary = new FetchMyBookLibrary("getPastReadBooks", authToken);
 
         // instantiate the TimelineFragment
@@ -79,8 +79,14 @@ public class HistoryFragment extends Fragment {
         mFragment.addOnClickListener(new TimelineObjectClickListener() {
             @Override
             public void onTimelineObjectClicked(TimelineObject timelineObject) {
-                
-                startActivity(new Intent(getContext(), BookUpdate.class));
+                Book b = (Book) timelineObject;
+
+                Intent i = new Intent(getContext(), BookUpdate.class);
+                i.putExtra("title", timelineObject.getTitle());
+                i.putExtra("authors", b.getAuthors());
+                i.putExtra("imageUrl", timelineObject.getImageUrl());
+                i.putExtra("bookId", b.getBookId());
+                startActivity(i);
              }
              @Override
              public void onTimelineObjectLongClicked(TimelineObject timelineObject) {
@@ -113,7 +119,6 @@ public class HistoryFragment extends Fragment {
     }
 
     private void setData(String result) {
-        Log.v("result", result);
 
         try {
             JSONObject jsonObject = new JSONObject(result);
@@ -126,6 +131,7 @@ public class HistoryFragment extends Fragment {
                 String imageUrl = null;
                 String date = null;
                 JSONObject volumeInfo = book.getJSONObject("volumeInfo");
+                String bookId = book.getString("id");
 
                 try {
                     //imageUrl= volumeInfo.getJSONObject("imageLinks").getString("thumbnail");
@@ -137,7 +143,6 @@ public class HistoryFragment extends Fragment {
                 }
 
                 if (title != null && authors != null && date != null) {
-                    System.out.println(date);
 
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
                     long dateInLong = 0;
@@ -150,10 +155,12 @@ public class HistoryFragment extends Fragment {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    System.out.println(dateInLong);
+
 
                     Book b = new Book(dateInLong, title, fetchMyBookLibrary.getImageUrl(i));
-                    objs.add(new Book(dateInLong, title, fetchMyBookLibrary.getImageUrl(i)));
+                    b.setBookId(bookId);
+                    b.setAuthors(authors);
+                    objs.add(b);
                 }
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
@@ -169,6 +176,8 @@ public class HistoryFragment extends Fragment {
             objs.add(new Book(dtemp.getTime(), "Book", null));
             objs.add(new Book(dtemp.getTime(), "Book", null));
 
+            this.sort(objs);
+
 
 
             //temp data
@@ -181,5 +190,21 @@ public class HistoryFragment extends Fragment {
         }
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    private void sort(ArrayList<TimelineObject> objs) {
+        for (int i = 0; i < objs.size(); i++) {
+            long min = objs.get(i).getTimestamp();
+            int minId = i;
+            for (int j = i+1; j < objs.size(); j++) {
+                if (objs.get(j).getTimestamp() > min) {
+                    min = objs.get(j).getTimestamp();
+                    minId = j;
+                }
+            }
+            TimelineObject temp = objs.get(i);
+            objs.set(i, objs.get(minId));
+            objs.set(minId, temp);
+        }
     }
 }

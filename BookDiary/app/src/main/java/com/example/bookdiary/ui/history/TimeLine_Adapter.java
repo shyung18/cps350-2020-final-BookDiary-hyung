@@ -65,15 +65,6 @@ public class TimeLine_Adapter extends RecyclerView.Adapter<TimeLineViewHolder> {
 
     @Override
     public void onBindViewHolder(final TimeLineViewHolder holder, int position) {
-        //holder.mTimelineView.set
-        Log.v("Does", "this work");
-
-        holder.mTimelineView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.v("here", "here");
-            }
-        });
 
     }
 
