@@ -22,11 +22,22 @@ public class Book implements TimelineObject {
     long timestamp;
     String name, url;
     private String authors = "";
+    private String bookId = "";
 
     Book(long time, String category, String url) {
         timestamp = time;
         name = category;
         this.url = url;
+    }
+
+    public void setBookId(String bookId)
+    {
+        this.bookId = bookId;
+    }
+
+    public String getBookId()
+    {
+        return bookId;
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -23,8 +24,12 @@ import com.example.bookdiary.MainActivity;
 import com.example.bookdiary.R;
 import com.example.bookdiary.ui.home.ReflectionView;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 public class BookUpdate extends Activity {
@@ -46,12 +51,14 @@ public class BookUpdate extends Activity {
         String title = i.getStringExtra("title");
         String authors = i.getStringExtra("authors");
         String imageUrl = i.getStringExtra("imageUrl");
+        String bookId = i.getStringExtra("bookId");
+
         ImageView imageView = findViewById(R.id.main_image);
         TextView titleView = findViewById(R.id.main_title);
         TextView authorView = findViewById(R.id.main_author);
+
         Button button = findViewById(R.id.doneButton);
         ReflectionView reflectionView = findViewById(R.id.rView);
-        reflectionView.setmText("NONE");
         button.setVisibility(View.GONE);
         titleView.setText(title);
         authorView.setText(authors);
@@ -63,6 +70,9 @@ public class BookUpdate extends Activity {
         }
         imageView.setImageBitmap(bitmap);
 
+        SharedPreferences sharedPref = getSharedPreferences("com.example.bookdiary", Context.MODE_PRIVATE);
+        String reflectionText = sharedPref.getString(bookId, "None");
+        reflectionView.setmText(reflectionText);
 
     }
 

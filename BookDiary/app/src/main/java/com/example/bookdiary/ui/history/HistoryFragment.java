@@ -54,10 +54,8 @@ public class HistoryFragment extends Fragment {
         mAdapter = new TimeLine_Adapter(root.getContext(), objs);
 
         if (bundle != null) {
-            //Log.v("authToken", bundle.getString("authToken"));
             authToken = bundle.getString("authToken");
         }
-        Log.v("authToken", authToken);
         fetchMyBookLibrary = new FetchMyBookLibrary("getPastReadBooks", authToken);
 
         // instantiate the TimelineFragment
@@ -82,10 +80,12 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onTimelineObjectClicked(TimelineObject timelineObject) {
                 Book b = (Book) timelineObject;
+
                 Intent i = new Intent(getContext(), BookUpdate.class);
                 i.putExtra("title", timelineObject.getTitle());
                 i.putExtra("authors", b.getAuthors());
                 i.putExtra("imageUrl", timelineObject.getImageUrl());
+                i.putExtra("bookId", b.getBookId());
                 startActivity(i);
              }
              @Override
@@ -119,7 +119,6 @@ public class HistoryFragment extends Fragment {
     }
 
     private void setData(String result) {
-        Log.v("result", result);
 
         try {
             JSONObject jsonObject = new JSONObject(result);
@@ -132,6 +131,7 @@ public class HistoryFragment extends Fragment {
                 String imageUrl = null;
                 String date = null;
                 JSONObject volumeInfo = book.getJSONObject("volumeInfo");
+                String bookId = book.getString("id");
 
                 try {
                     //imageUrl= volumeInfo.getJSONObject("imageLinks").getString("thumbnail");
@@ -158,6 +158,7 @@ public class HistoryFragment extends Fragment {
 
 
                     Book b = new Book(dateInLong, title, fetchMyBookLibrary.getImageUrl(i));
+                    b.setBookId(bookId);
                     b.setAuthors(authors);
                     objs.add(b);
                 }
